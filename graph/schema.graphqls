@@ -2,7 +2,7 @@
 #
 # https://gqlgen.com/getting-started/
 
-# query
+# query / GET in Rest API
 type Query {
   todos: [Todo!]
 }
@@ -19,7 +19,7 @@ type User {
   name: String!
 }
 
-# mutation
+# mutation / PUT/PATCH/DELETE in Rest API
 type Mutation {
   createTodo(input: NewTodo!): Todo!
 }

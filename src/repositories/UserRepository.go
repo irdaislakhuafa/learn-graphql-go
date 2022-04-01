@@ -14,7 +14,7 @@ type UserRepository struct {
 	Connection *sqlx.DB
 }
 
-func (ur *UserRepository) Save(entity model.User) (*model.User, error) {
+func (ur *UserRepository) Save(entity *model.User) (*model.User, error) {
 	log.Println("Saving entity user...")
 
 	defer func() {
@@ -43,5 +43,41 @@ func (ur *UserRepository) FindById(ID *string) *model.User {
 	} else {
 		log.Println("Finding user by id...")
 		return &user
+	}
+}
+
+func (ur *UserRepository) Update(userId string, entity *model.User) *model.User {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Error during updated user :", err)
+		}
+	}()
+
+	ur.Connection.Query("UPDATE users SET name=? WHERE id=?", entity.Name, userId)
+	return ur.FindById(&userId)
+}
+
+func (ur *UserRepository) DeleteById(userId string) error {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Error during delete user :", r)
+		}
+	}()
+
+	_, err := ur.Connection.Query("DELETE FROM users WHERE id=?", userId)
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (ur *UserRepository) FindAll() (users []model.User, err error) {
+	err = ur.Connection.Select(&users, "SELECT * FROM users")
+	if err != nil {
+		log.Println("Error during get all data users :", err)
+		return nil, err
+	} else {
+		return users, nil
 	}
 }

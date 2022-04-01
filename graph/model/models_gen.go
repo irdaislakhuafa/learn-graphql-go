@@ -3,14 +3,14 @@
 package model
 
 type Todo struct {
-	ID string `json:"id"`
-	Text string `json:"text"`
-	Done bool `json:"done"`
+	ID string `json:"id" db:"id"`
+	Text string `json:"text" db:"text_todo"`
+	Done bool `json:"done" db:"done"`
 	User *User `json:"user"`
 }
 type User struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id" db:"id"`
+	Name string `json:"name" db:"name"`
 }
 
 type NewTodo struct {

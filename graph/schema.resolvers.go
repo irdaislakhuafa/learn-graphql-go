@@ -5,47 +5,55 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"math/rand"
-	"strconv"
+	"log"
 
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/generated"
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, in model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) CreateTodo(ctx context.Context, newTodo model.NewTodo) (*model.Todo, error) {
+
 	defer func() {
 		err := recover()
 		if err != nil {
-			panic(fmt.Errorf("not implemented"))
+			log.Println("Error while saving new todo :", err)
 		}
 	}()
-
-	// mapping model.NewTodo to model.Todo
 	todo := &model.Todo{
-		ID:   strconv.Itoa(rand.Int()),
-		Text: in.Text,
-		User: &model.User{
-			ID:   in.UserID,
-			Name: "User " + in.UserID,
-		},
+		Text: newTodo.Text,
+		Done: false,
+		User: r.UserRepository.FindById(&newTodo.UserID),
 	}
 
-	// add new model.Todo to slice `todos` (InMemoryDatabase)
-	r.todos = append(r.todos, todo)
-	return todo, nil
+	_, err := r.TodoRepository.Save(todo)
+
+	if err != nil {
+		return nil, err
+	} else {
+		return todo, nil
+	}
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			panic(fmt.Errorf("not implemented"))
+			log.Println("Error while finad all todos :", err)
 		}
 	}()
 
-	// return list of todos from InMemoryDatabase
-	return r.todos, nil
+	todoDto, err := r.TodoRepository.FindAll()
+
+	todos := make([]*model.Todo, 0)
+	for _, value := range todoDto {
+		todo := r.TodoRepository.MapToEntity(value)
+		todos = append(todos, &todo)
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		return todos, nil
+	}
 }
 
 // Mutation returns generated.MutationResolver implementation.

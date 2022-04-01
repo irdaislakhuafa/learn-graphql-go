@@ -10,6 +10,7 @@ import (
 	"github.com/irdaislakhuafa/learn-graphql-go/graph"
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/generated"
 	"github.com/irdaislakhuafa/learn-graphql-go/src/database"
+	"github.com/irdaislakhuafa/learn-graphql-go/src/repositories"
 	"github.com/irdaislakhuafa/learn-graphql-go/src/schema"
 )
 
@@ -17,6 +18,7 @@ const defaultPort = "8080"
 
 func main() {
 
+	// connect to database
 	dbcon := database.DBConnection{
 		Driver:   "mysql",
 		Username: "root",
@@ -26,17 +28,30 @@ func main() {
 	}
 	dbcon.Connect()
 
+	// generate table schema
 	schemaGenerator := database.SchemaGenerator{
 		Connection: dbcon.GetConnection(),
 	}
 	schemaGenerator.GenerateSchema(schema.Users, schema.Todo)
 
+	// define repositories
+	userRepository := &repositories.UserRepository{
+		Connection: dbcon.GetConnection(),
+	}
+	todoRepository := &repositories.TodoRepository{
+		Connection: dbcon.GetConnection(),
+	}
+
+	// run graphql
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+		UserRepository: userRepository,
+		TodoRepository: todoRepository,
+	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

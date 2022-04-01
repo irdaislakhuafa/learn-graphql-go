@@ -9,11 +9,28 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/irdaislakhuafa/learn-graphql-go/graph"
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/generated"
+	"github.com/irdaislakhuafa/learn-graphql-go/src/database"
+	"github.com/irdaislakhuafa/learn-graphql-go/src/schema"
 )
 
 const defaultPort = "8080"
 
 func main() {
+
+	dbcon := database.DBConnection{
+		Driver:   "mysql",
+		Username: "root",
+		Password: "password",
+		DBName:   "learn_graphql_go",
+		DBPort:   "3306",
+	}
+	dbcon.Connect()
+
+	schemaGenerator := database.SchemaGenerator{
+		Connection: dbcon.GetConnection(),
+	}
+	schemaGenerator.GenerateSchema(schema.Users, schema.Todo)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort

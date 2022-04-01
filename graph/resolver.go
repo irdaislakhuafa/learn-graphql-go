@@ -3,6 +3,7 @@ package graph
 import (
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/model"
 	"github.com/irdaislakhuafa/learn-graphql-go/src/repositories"
+	"github.com/jmoiron/sqlx"
 )
 
 // This file will not be regenerated automatically.
@@ -13,4 +14,5 @@ type Resolver struct {
 	todos          []*model.Todo
 	UserRepository *repositories.UserRepository
 	TodoRepository *repositories.TodoRepository
+	Connection     *sqlx.DB
 }

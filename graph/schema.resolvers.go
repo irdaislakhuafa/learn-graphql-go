@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/generated"
@@ -39,12 +38,22 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			panic(fmt.Errorf("not implemented"))
+			log.Println("Error while finad all todos :", err)
 		}
 	}()
 
-	// return list of todos from InMemoryDatabase
-	return r.todos, nil
+	todoDto, err := r.TodoRepository.FindAll()
+
+	todos := make([]*model.Todo, 0)
+	for _, value := range todoDto {
+		todo := r.TodoRepository.MapToEntity(value)
+		todos = append(todos, &todo)
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		return todos, nil
+	}
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/irdaislakhuafa/learn-graphql-go/graph/model"
+	"github.com/irdaislakhuafa/learn-graphql-go/src/dtos"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -58,12 +59,27 @@ func (td *TodoRepository) DeleteById(ID string) error {
 	}
 }
 
-func (td *TodoRepository) FindAll() (todos []model.Todo, err error) {
+func (td *TodoRepository) FindAll() (todos []*dtos.Todo, err error) {
 	err = td.Connection.Select(&todos, "SELECT * FROM todo")
-
 	if err != nil {
 		return nil, err
 	} else {
 		return todos, nil
+	}
+}
+
+func (td *TodoRepository) MapToEntity(entityDto *dtos.Todo) model.Todo {
+	user := model.User{}
+	err := td.Connection.Get(&user, "SELECT users.id, users.name FROM todo INNER JOIN users ON todo.user_id=users.id")
+
+	if err != nil {
+		log.Println("Error :", err)
+		return model.Todo{}
+	}
+
+	return model.Todo{
+		Text: entityDto.Text,
+		Done: entityDto.Done,
+		User: &user,
 	}
 }

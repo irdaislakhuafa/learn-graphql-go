@@ -6,7 +6,7 @@ type Todo struct {
 	ID string `json:"id" db:"id"`
 	Text string `json:"text" db:"todo_text"`
 	Done bool `json:"done" db:"done"`
-	User *User `json:"user"`
+	User *User `json:"user" db:"user_id"`
 }
 type User struct {
 	ID string `json:"id" db:"id"`

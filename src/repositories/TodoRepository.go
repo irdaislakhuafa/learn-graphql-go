@@ -13,9 +13,9 @@ type TodoRepository struct {
 }
 
 func (td *TodoRepository) Save(entity *model.Todo) (*model.Todo, error) {
-	query := "INSERT INTO todo (id, todo_text) VALUES (?, ?)"
+	query := "INSERT INTO todo (id, todo_text, user_id) VALUES (?, ?, ?)"
 	entity.ID = uuid.NewString()
-	_, err := td.Connection.Query(query, entity.ID, entity.Text)
+	_, err := td.Connection.Query(query, entity.ID, entity.Text, entity.User.ID)
 
 	if err != nil {
 		log.Println("Error during save new Todo :", err)

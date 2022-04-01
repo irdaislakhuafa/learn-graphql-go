@@ -4,7 +4,7 @@ package model
 
 type Todo struct {
 	ID string `json:"id" db:"id"`
-	Text string `json:"text" db:"text_todo"`
+	Text string `json:"text" db:"todo_text"`
 	Done bool `json:"done" db:"done"`
 	User *User `json:"user"`
 }
